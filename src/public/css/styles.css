@@ -1,0 +1,42 @@
+/* Layout */
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  /* background-color: #f8f9fa; 
+  background: linear-gradient(45deg, #cd3075, #f2b8ef, #2c562a00);*/
+  background: linear-gradient(45deg, #96f6af, #97edac78, white);
+  background-size: 300% 300%;
+  /* Gradient from pink to white */
+
+  animation: gradientShift 7s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+#title {
+  color: royalblue;
+  margin: 20px;
+  font-weight: 700;
+  font-family: "circular";
+}
+
+.container {
+  background-color: floralwhite;
+  border-radius: 10px;
+  border: solid 1px black;
+}
+
+.form-label {
+  font-style: italic;
+}
