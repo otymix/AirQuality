@@ -17,7 +17,6 @@ app.use(bodyParser.json());
 
 // Health Check Route
 app.get("/", (req: Request, res: Response) => {
-  console.log(" Main point");
   res.sendFile(__dirname + "/public/index.html");
 });
 

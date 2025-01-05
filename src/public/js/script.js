@@ -197,7 +197,7 @@
           .join("/");
 
         if (!startDate || !endDate) {
-          alert("Please select both start and end dates.");
+          showAlert("Please select both start and end dates.",'warning');
           return;
         }
 
@@ -206,7 +206,6 @@
         fetch(backendUrl)
           .then((response) => response.json())
           .then((data) => {
-            console.log(data);
             const labels = data.map((item) =>
               formatDateForChart(item.date, item.time, "date")
             );
@@ -222,13 +221,12 @@
             const datasets = fieldsList.map((field) => ({
               label: `Time Series for ${field.name.toUpperCase()}`,
               data: data.map((item) => item[field.name]),
-              borderColor: "rgba(75, 192, 192, 1)",
+              borderColor: field.color,
               backgroundColor: field.color,
-              fill: true,
+              fill: false,
               tension: 0.1,
             }));
 
-            console.log(JSON.stringify(datasets));
 
             chart = new Chart(ctx, {
               type: "line",
@@ -246,10 +244,16 @@
                   legend: {
                     position: "top",
                     onClick: (evt, legendItem, legend) => {
+                      console.log(datasets[0].data.length)
+                      if(datasets[0].data.length > 1500){
+                        showAlert("Too Much data to filter! Try narrowing down the time window of the search for a smooth user experience!",'info')
+                      }
+                      else
+                      {
                       const index = legendItem.datasetIndex;
                       const ci = legend.chart;
 
-                      // Toggle clicked dataset
+                        // Toggle clicked dataset
                       if (ci.isDatasetVisible(index)) {
                         console.log("Will Hide...", index, legend.chart);
                         ci.hide(index);
@@ -261,13 +265,15 @@
                       }
 
                       // Optional: Hide all other datasets when one is clicked
-                      // (Comment out this part if you don't want this behavior)
-                      ci.data.datasets.forEach((dataset, idx) => {
+                      ci.data.datasets.forEach((_dataset, idx) => {
                         if (idx !== index) {
                           ci.hide(idx);
                           legend.legendItems[idx].hidden = true;
                         }
                       });
+
+                      }
+
                     },
                   },
                   tooltip: {
@@ -301,7 +307,7 @@
 
             // Add double-click handler to show all datasets
             chart.canvas.addEventListener("dblclick", () => {
-              chart.data.datasets.forEach((dataset, index) => {
+              chart.data.datasets.forEach((_dataset, index) => {
                 chart.show(index);
                 chart.legend.legendItems[index].hidden = false;
               });
@@ -310,9 +316,7 @@
           })
           .catch((error) => {
             console.error("Error fetching data:", error);
-            alert(
-              "Failed to fetch data. Please check the console for details."
-            );
+             showAlert("Failed to fetch data. Please check the console for details.",'danger');
           });
       });
 
@@ -341,7 +345,7 @@
                   borderColor: fieldsList.find((e) => e.name === param).color,
                   backgroundColor: fieldsList.find((e) => e.name === param)
                     .color,
-                  fill: true,
+                  fill: false,
                   tension: 0.1,
                 });
               }
@@ -397,7 +401,7 @@
           .join("/");
 
         if (!startDate || !endDate) {
-          alert("Please select both start and end dates.");
+          showAlert("Please, First select both start and end dates.",'warning');
           return;
         }
 
@@ -405,3 +409,23 @@
         console.log(" Sleected ", e.target.value);
         updateChart(e.target.value, backendUrl);
       });
+
+
+  const showAlert = (message, type = 'info') => {
+    const alertContainer = document.getElementById('alertContainer');
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    alertContainer.appendChild(alert);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 150);
+    }, 5000);
+};
